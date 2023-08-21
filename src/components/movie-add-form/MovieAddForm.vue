@@ -1,5 +1,5 @@
 <template>
-    <div class="movie-add-form">
+    <box class="movie-add-form">
        <h3>Yangi kino qoshish</h3>
        <form class="add-form d-flex" @submit.prevent>
 
@@ -23,20 +23,16 @@
           @click="addMovie">Qo'shish</PrimaryButton>
 
        </form>
-    </div>
+    </box>
 </template>
 
 <script>
-import PrimaryButton from '@/ui-components/PrimaryButton.vue'
 export default {
     data(){
         return{
             name: '',
             viewers: '',
         }
-    },
-    comments: {
-        PrimaryButton
     },
     methods: {
         addMovie() {
@@ -49,7 +45,7 @@ export default {
                 id: Date.now(),
             }
             this.$emit('createMovie', newMovie) //ona divga ma'lumot jo'natish
-            this.name = '',
+            this.name = ''
             this.viewers = ''
         },
     },

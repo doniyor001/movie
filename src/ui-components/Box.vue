@@ -10,6 +10,7 @@ export default {
 </script>
 <style>
 .box{
+    margin-top: 2rem;
     padding: 1.5rem;
     border-radius: 4px;
     background-color: #fcfaf5;
