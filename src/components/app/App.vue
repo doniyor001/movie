@@ -1,5 +1,5 @@
 <template>
-    <div class="app">
+    <div class="app font-monospace">
       <div class="content">
         <AppInfo :allMoviesCount="movies.length"
                  :favouriteMoviesCount="movies.filter(c => c.favourite).length" />
@@ -7,7 +7,14 @@
           <SearchPanel :updateTernHandler="updateTernHandler"/>
           <AppFilter :updateFilterHandler="updateFilterHandler" :filterName="filter" />
         </div>
-        <MovieList 
+        <Box v-if="!movies.length && !isLoading">
+            <p class="text-center fs-3 text-danger">Kinolar yo'q</p>
+        </Box>
+          <Box v-else-if="isLoading" class="d-flex justify-content-center">
+              <Loader/>
+          </Box>
+        <MovieList
+        v-else
         v-bind:movies="onFilterHandler(onSearchHandler(movies, term), filter)" 
         @onToggle="onToggleHandler" 
         @onRemove='onRemoveHandler'/>
@@ -23,9 +30,16 @@
   import AppFilter from '@/components/app-filter/AppFilter.vue'
   import MovieList from '@/components/movie-list/MovieList.vue'
   import MovieAddForm from '@/components/movie-add-form/MovieAddForm.vue'
+  import axios from "axios";
+  import PrimaryButton from "@/ui-components/PrimaryButton.vue";
+  import Box from "@/ui-components/Box.vue";
+  import Loader from "@/ui-components/Loader.vue";
   
   export default{
     components:{
+        Loader,
+        Box,
+        PrimaryButton,
       AppInfo,
       SearchPanel,
       AppFilter,
@@ -34,31 +48,13 @@
     },
     data() {
         return {
-            movies:[
-                {
-                    name:'Mission Impossible',
-                    viewers:800,
-                    favourite: false,
-                    like: true,
-                    id:1,
-                },
-                {
-                    name:'Game of Thrones',
-                    viewers:650,
-                    favourite: false,
-                    like: false,
-                    id:2,
-                },
-                {
-                    name:'James Bond',
-                    viewers:911,
-                    favourite: true,
-                    like: false,
-                    id:3,
-                },
-            ],
+            movies:[],
             term: '',
             filter: 'all',
+            isLoading: false,
+            limit: 10,
+            page: 1,
+            totalPages: 0,
         }
     },
     methods: {
@@ -97,8 +93,37 @@
       },
       updateFilterHandler(filter){
         this.filter = filter
-      }
+      },
+      async fetchMovie(){
+          try {
+            this.isLoading = true
+                const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+                    params:{
+                        _limit: this.limit,
+                        _page: this.page,
+                    },
+                })
+                const newArr = response.data.map(item => ({
+                    id: item.id,
+                    name: item.title,
+                    like: false,
+                    favourite: false,
+                    viewers:item.id * 10,
+                }))
+                this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
+                this.movies = newArr
+                console.log(this.totalPages);
+          }catch (error){
+              alert(error.message)
+          }finally {
+              this.isLoading = false
+          }
+      },
     },
+    mounted() {
+        this.fetchMovie()
+    }
+
   }
  </script>
   
@@ -124,6 +149,4 @@
     border-radius: 4px;
     box-shadow: 15px 15px 15px rgba(0, 0, 0, 0.15);
   }
-
-
   </style>

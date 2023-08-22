@@ -1,13 +1,16 @@
 <template>
-    <input type="text" 
-    class="form-control search-input" 
+    <Input
+    class="search-input"
     placeholder="Kinolarni qidirish"
-    :value="term"
+    v-model="term"
     @input="changeHandler"/>
 </template>
 
 <script>
+import Input from "@/ui-components/Input.vue";
+
 export default {
+    components: {Input},
   props: {
     updateTernHandler: {
       type: Function,

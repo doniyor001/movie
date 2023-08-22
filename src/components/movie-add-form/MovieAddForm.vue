@@ -3,19 +3,18 @@
        <h3>Yangi kino qoshish</h3>
        <form class="add-form d-flex" @submit.prevent>
 
-        <input 
-        type="text" 
-        class="form-control new-movie-label" 
+        <Input
+        class="new-movie-label"
         placeholder="Qanday kino?" 
-        :value="name"
-        v-on:input="name = $event.target.value"/>
+        v-model="name"
+        @input="name = $event.target.value"/>
 
-        <input 
+        <Input
+          class="new-movie-label"
+          placeholder="Nechi marotaba ko'rilgan?"
           type="number"
-          class="form-control new-movie-label"
-          placeholder="Nechi marotaba ko'rilgan?" 
-          :value="viewers"
-          v-on:input="viewers = $event.target.value"/>
+          v-model="viewers"
+          @input="viewers = $event.target.value"/>
 
           <PrimaryButton 
           class="btn-outline-dark" 
@@ -27,7 +26,10 @@
 </template>
 
 <script>
+import Input from "@/ui-components/Input.vue";
+
 export default {
+    components: {Input},
     data(){
         return{
             name: '',
@@ -53,11 +55,4 @@ export default {
 </script>
 
 <style>
-.movie-add-form{
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background-color: #fcfaf5;
-    border-radius: 4px;
-    box-shadow: 15px 15px 15px rgba(0, 0, 0, 0.15);
-}
 </style>
