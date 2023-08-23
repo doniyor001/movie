@@ -18,6 +18,19 @@
         v-bind:movies="onFilterHandler(onSearchHandler(movies, term), filter)" 
         @onToggle="onToggleHandler" 
         @onRemove='onRemoveHandler'/>
+        <Box class="d-flex justify-content-center">
+            <nav aria-label="pagination">
+                <ul class="pagination pagination-sm">
+                    <li v-for="pageNumber in totalPages"
+                    :key="pageNumber"
+                    :class="{active: pageNumber === page}"
+                    @click="changePageHandler(pageNumber)">
+
+                        <span class="page-link">{{ pageNumber }}</span>
+                    </li>
+                </ul>
+            </nav>
+        </Box>
         <MovieAddForm @createMovie="createMovie"/>
       </div>
     </div>
@@ -34,9 +47,11 @@
   import PrimaryButton from "@/ui-components/PrimaryButton.vue";
   import Box from "@/ui-components/Box.vue";
   import Loader from "@/ui-components/Loader.vue";
+  import Pagination from "@/ui-components/Pagination.vue";
   
   export default{
     components:{
+        Pagination,
         Loader,
         Box,
         PrimaryButton,
@@ -58,22 +73,35 @@
         }
     },
     methods: {
-      createMovie(item){
-        this.movies.push(item)
+      async createMovie(item){
+        try {
+            const response = await axios.post('https://jsonplaceholder.typicode.com/posts', item)
+            console.log(response)
+            this.movies.push(response.data)
+        }catch (error){
+            alert(error.message)
+        }
+
       },
       onToggleHandler({id, prop}){
         this.movies = this.movies.map(item =>{
-          if(item.id == id){
+          if(item.id === id){
             return {...item, [prop]: !item[prop]}
           }
           return item
         })
       },
-      onRemoveHandler(id){
-        this.movies = this.movies.filter(c => c.id !== id)
+      async onRemoveHandler(id){
+        try {
+            const response = await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`)
+            console.log(response)
+            this.movies = this.movies.filter(c => c.id !== id)
+        }catch (error){
+            alert(error.message)
+        }
       },
       onSearchHandler(arr, term){
-        if(term.length == 0){
+        if(term.length === 0){
           return arr
         }
         return arr.filter(c => c.name.toLowerCase().indexOf(term) > -1)
@@ -119,10 +147,19 @@
               this.isLoading = false
           }
       },
+        changePageHandler(page){
+            this.page = page
+            this.fetchMovie()
+        },
     },
     mounted() {
         this.fetchMovie()
-    }
+    },
+    watch:{
+        page(){
+            this.fetchMovie()
+        },
+    }  ,
 
   }
  </script>
